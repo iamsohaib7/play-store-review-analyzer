@@ -45,7 +45,6 @@
 ---
 **NOTE**
 
-This is Final Year Project, So don't take it seriouly
-We will invent new things which others have never seen
+This is Final Year Project
 
 ---
