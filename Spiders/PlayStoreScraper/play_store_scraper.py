@@ -1,7 +1,7 @@
 import json
 import re
 import time
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import httpx
 from PlayStoreScraper.constants import play_store_elements as elements
@@ -9,6 +9,9 @@ from PlayStoreScraper.constants import play_store_enums
 
 PLAY_STORE_BASE_URL = "https://play.google.com"
 REVIEWS_REGEX = re.compile(r"\)]}'\n\n([\s\S]+)")
+APP_SCRIPT_REGEX = re.compile(r"AF_initDataCallback[\s\S]*?</script")
+APP_KEY_REGEX = re.compile("(ds:.*?)'")
+APP_VALUE_REGEX = re.compile(r"data:([\s\S]*?), sideChannel: {}}\);<\/")
 MAX_COUNT_EACH_FETCH = 4500
 
 
@@ -46,6 +49,7 @@ class PlayStoreRequest:
         for _ in range(self._MAX_RETRIES):
             try:
                 response = httpx.post(url, data=data, headers=headers)
+                response.raise_for_status()
                 response_text = response.text
 
                 if "com.google.play.gateway.proto.PlayGatewayError" in response_text:
@@ -64,6 +68,15 @@ class PlayStoreRequest:
                 last_exception = e
                 continue
         raise last_exception
+
+    def get(self, url) -> str:
+        with httpx.Client() as client:
+            try:
+                response = client.get(url)
+                response.raise_for_status()
+                return response.text
+            except httpx.RequestError as e:
+                raise e
 
 
 class PlayStoreReviews:
@@ -239,4 +252,52 @@ class PlayStoreReviews:
                 break
             if sleep_milliseconds:
                 time.sleep(sleep_milliseconds / 1000)
+        return result
+
+
+class PlayStoreAppDetails:
+    __URL_FORMAT = (
+        "{}/store/apps/details?id={{app_id}}&hl={{lang}}&gl={{country}}".format(
+            PLAY_STORE_BASE_URL
+        )
+    )
+
+    def __init__(self):
+        self.__play_store_req = PlayStoreRequest()
+        self.url = None
+
+    def __build_url(self, app_id: str, lang: str, country: str) -> str:
+        return self.__URL_FORMAT.format(app_id=app_id, lang=lang, country=country)
+
+    def __fetch_app_details(
+        self, app_id: str, lang: str = "en", country: str = "us"
+    ) -> str:
+        self.url = self.__build_url(app_id, lang, country)
+        app_text = self.__play_store_req.get(self.url)
+        return app_text
+
+    def app(self, app_id: str, lang: str = "en", country: str = "us", **kwargs) -> Dict:
+        app_text = self.__fetch_app_details(app_id, lang, country)
+        matched_result = APP_SCRIPT_REGEX.findall(app_text)
+        dataset: Dict = {}
+
+        for match in matched_result:
+            key_match = APP_KEY_REGEX.findall(match)
+            value_match = APP_VALUE_REGEX.findall(match)
+            if key_match and value_match:
+                key = key_match[0]
+                value = json.loads(value_match[0])
+                dataset[key] = value
+        result = {}
+
+        for k, spec in elements.ElementSpecs.Detail.items():
+            content = spec.extract_content(dataset)
+            if content is None:
+                result[k] = spec.fallback_value
+            else:
+                result[k] = content
+
+        result["appId"] = app_id
+        result["url"] = self.url
+
         return result
