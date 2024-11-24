@@ -166,3 +166,6 @@ output.json
 
 # temp.py file for running or testing scripts
 temp.py
+
+# ./db-data postgres volume data
+db-data/
