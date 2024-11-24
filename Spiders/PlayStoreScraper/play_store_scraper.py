@@ -4,8 +4,8 @@ import time
 from typing import Dict, List, Optional, Tuple, Union
 
 import httpx
-from PlayStoreScraper.constants import play_store_elements as elements
-from PlayStoreScraper.constants import play_store_enums
+from Spiders.PlayStoreScraper.constants import play_store_elements as elements
+from Spiders.PlayStoreScraper.constants import play_store_enums
 
 PLAY_STORE_BASE_URL = "https://play.google.com"
 REVIEWS_REGEX = re.compile(r"\)]}'\n\n([\s\S]+)")
