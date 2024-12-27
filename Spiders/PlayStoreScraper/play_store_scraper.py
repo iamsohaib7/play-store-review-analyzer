@@ -165,7 +165,7 @@ class PlayStoreReviews:
         filter_score_with: int = None,
         filter_device_with: int = None,
         continuation_token: ContinuationToken = None,
-    ) -> Tuple[List[dict], ContinuationToken]:
+    ) -> Optional[Tuple[List[dict], ContinuationToken]]:
         sort = sort.value
 
         if continuation_token is not None:
@@ -173,10 +173,7 @@ class PlayStoreReviews:
             print(token)
 
             if token is None:
-                return (
-                    [],
-                    continuation_token,
-                )
+                return None
 
             lang = continuation_token.lang
             country = continuation_token.country
