@@ -4,9 +4,19 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import (TIMESTAMP, Date, DateTime, Float, ForeignKey,
-                        ForeignKeyConstraint, Integer, String, Text, Uuid,
-                        func)
+from sqlalchemy import (
+    TIMESTAMP,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    String,
+    Text,
+    Uuid,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -23,7 +33,7 @@ class AppInfoModel(BaseModel):
     url: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     app_description: Mapped[str] = mapped_column(Text, nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now, init=False
+        TIMESTAMP(timezone=True), default=func.now
     )
     summary: Mapped[str] = mapped_column(String(255), nullable=True)
     released_at: Mapped[Date] = mapped_column(Date, nullable=True)
@@ -58,7 +68,7 @@ class AppReviewsModel(BaseModel):
     reply_time: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     current_app_version: Mapped[str] = mapped_column(String(100), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now, init=False
+        TIMESTAMP(timezone=True), default=func.now
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="reviews")
 
@@ -87,7 +97,7 @@ class AppDetailsModel(BaseModel):
     last_updated: Mapped[datetime.date] = mapped_column(Date, nullable=True)
     version: Mapped[str] = mapped_column(String(50), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now, init=False
+        TIMESTAMP(timezone=True), default=func.now
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="details")
 
@@ -108,7 +118,7 @@ class AppRatingsHistogramModel(BaseModel):
     rating_star: Mapped[Integer] = mapped_column(Integer, nullable=False, default=0)
     ratings_count: Mapped[Integer] = mapped_column(Integer, nullable=False, default=0)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now, init=False
+        TIMESTAMP(timezone=True), default=func.now
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="ratings_histogram")
 
@@ -127,9 +137,7 @@ class AppDeveloperDetailsModel(BaseModel):
     added_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         default=func.now,
-        init=False
     )
     app_info: Mapped["AppInfoModel"] = relationship(
         back_populates="app_developer_details"
     )
-
