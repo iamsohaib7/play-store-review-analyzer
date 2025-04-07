@@ -4,19 +4,9 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import (
-    TIMESTAMP,
-    Date,
-    DateTime,
-    Float,
-    ForeignKey,
-    ForeignKeyConstraint,
-    Integer,
-    String,
-    Text,
-    Uuid,
-    func,
-)
+from sqlalchemy import (TIMESTAMP, Date, DateTime, Float, ForeignKey,
+                        ForeignKeyConstraint, Integer, String, Text, Uuid,
+                        func)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -32,8 +22,10 @@ class AppInfoModel(BaseModel):
     app_name: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     app_description: Mapped[str] = mapped_column(Text, nullable=True)
+    icon_url: Mapped[str] = mapped_column(String(255), nullable=True)
+    genre: Mapped[str] = mapped_column(String(255), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now
+        TIMESTAMP(timezone=True), default=func.now()
     )
     summary: Mapped[str] = mapped_column(String(255), nullable=True)
     released_at: Mapped[Date] = mapped_column(Date, nullable=True)
@@ -54,7 +46,14 @@ class AppInfoModel(BaseModel):
 
 class AppReviewsModel(BaseModel):
     __tablename__ = "app_reviews"
-    app_id: Mapped[str] = mapped_column(ForeignKey("app_information.app_id"))
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["app_id", "app_country"],
+            ["app_information.app_id", "app_information.country"],
+        ),
+    )
+    app_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    app_country: Mapped[str] = mapped_column(String(100), nullable=False)
     review_id: Mapped[Uuid] = mapped_column(
         Uuid, nullable=False, primary_key=True, default=uuid.uuid4
     )
@@ -65,10 +64,10 @@ class AppReviewsModel(BaseModel):
     thumbs_up_count: Mapped[Integer] = mapped_column(Integer, nullable=False, default=0)
     review_created_version: Mapped[str] = mapped_column(String(100), nullable=True)
     review_reply: Mapped[str] = mapped_column(Text, nullable=True)
-    reply_time: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    reply_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     current_app_version: Mapped[str] = mapped_column(String(100), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now
+        TIMESTAMP(timezone=True), default=func.now()
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="reviews")
 
@@ -97,7 +96,7 @@ class AppDetailsModel(BaseModel):
     last_updated: Mapped[datetime.date] = mapped_column(Date, nullable=True)
     version: Mapped[str] = mapped_column(String(50), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now
+        TIMESTAMP(timezone=True), default=func.now()
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="details")
 
@@ -118,17 +117,24 @@ class AppRatingsHistogramModel(BaseModel):
     rating_star: Mapped[Integer] = mapped_column(Integer, nullable=False, default=0)
     ratings_count: Mapped[Integer] = mapped_column(Integer, nullable=False, default=0)
     added_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), default=func.now
+        TIMESTAMP(timezone=True), default=func.now()
     )
     app_info: Mapped["AppInfoModel"] = relationship(back_populates="ratings_histogram")
 
 
 class AppDeveloperDetailsModel(BaseModel):
     __tablename__ = "app_developer_details"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["app_id", "app_country"],
+            ["app_information.app_id", "app_information.country"],
+        ),
+    )
+    app_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    app_country: Mapped[str] = mapped_column(String(100), nullable=False)
     ID: Mapped[Integer] = mapped_column(
         Integer, nullable=False, primary_key=True, autoincrement=True
     )
-    app_id: Mapped[str] = mapped_column(ForeignKey("app_information.app_id"))
     developer_id: Mapped[str] = mapped_column(String, nullable=True)
     developer: Mapped[str] = mapped_column(String(255), nullable=True)
     developer_email: Mapped[str] = mapped_column(String(255), nullable=True)
@@ -136,7 +142,7 @@ class AppDeveloperDetailsModel(BaseModel):
     developer_address: Mapped[str] = mapped_column(String(255), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
-        default=func.now,
+        default=func.now(),
     )
     app_info: Mapped["AppInfoModel"] = relationship(
         back_populates="app_developer_details"
