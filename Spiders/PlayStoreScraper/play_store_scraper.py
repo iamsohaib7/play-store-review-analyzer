@@ -170,7 +170,7 @@ class PlayStoreReviews:
 
         if continuation_token is not None:
             token = continuation_token.token
-            print(token)
+            # print(token)
 
             if token is None:
                 return None
