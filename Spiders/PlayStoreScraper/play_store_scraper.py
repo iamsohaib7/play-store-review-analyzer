@@ -244,7 +244,7 @@ class PlayStoreReviews:
                 continuation_token=continuation_token,
                 **kwargs
             )
-            result.append(_result)
+            result.extend(_result)
             if continuation_token.token is None:
                 break
             if sleep_milliseconds:
