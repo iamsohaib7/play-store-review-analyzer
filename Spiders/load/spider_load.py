@@ -1,15 +1,15 @@
+import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List
 from uuid import UUID
-import asyncio
 
 from dotenv import load_dotenv
 from sqlalchemy import and_, create_engine, select
-from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from contextlib import asynccontextmanager
+from sqlalchemy.orm import Session, sessionmaker
 
 from Spiders.models.spider_models.models import (AppDetailsModel,
                                                  AppDeveloperDetailsModel,
@@ -19,7 +19,7 @@ from Spiders.models.spider_models.models import (AppDetailsModel,
 from Spiders.PlayStoreScraper.play_store_scraper import (PlayStoreAppDetails,
                                                          PlayStoreReviews)
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -32,13 +32,17 @@ DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DA
 ASYNC_DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 async_engine = create_async_engine(ASYNC_DB_URL)
-AsyncSessionLocal = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
+AsyncSessionLocal = sessionmaker(
+    async_engine, class_=AsyncSession, expire_on_commit=False
+)
 BaseModel.metadata.create_all(engine)
+
 
 @asynccontextmanager
 async def get_async_session():
     async with AsyncSessionLocal() as session:
         yield session
+
 
 def load_app_details(session, app_id, lang, country):
     try:
@@ -106,11 +110,19 @@ def load_app_details(session, app_id, lang, country):
     else:
         return True
 
-async def save_reviews_async(reviews: List[dict], app_id: str, country: str, latest_review_ids: set, session: AsyncSession):
+
+async def save_reviews_async(
+    reviews: List[dict],
+    app_id: str,
+    country: str,
+    latest_review_ids: set,
+    session: AsyncSession,
+):
+    flag = False
     for review in reviews:
         if UUID(review.get("reviewId")) in latest_review_ids:
-            return True  # flag = True
-
+            flag = True
+            continue
         review_model = AppReviewsModel(
             app_id=app_id,
             app_country=country,
@@ -128,19 +140,20 @@ async def save_reviews_async(reviews: List[dict], app_id: str, country: str, lat
         session.add(review_model)
 
     await session.commit()
-    return False
+    return flag
 
-def store_reviews_sync_way(reviews, app_id, country, latest_review_ids):
-    async def _wrapper():
-        async with get_async_session() as session:
-            return await save_reviews_async(reviews, app_id, country, latest_review_ids, session)
 
-    return asyncio.run(_wrapper())
+async def store_reviews_async_way(reviews, app_id, country, latest_review_ids):
+    async with get_async_session() as session:
+        return await save_reviews_async(
+            reviews, app_id, country, latest_review_ids, session
+        )
 
-def load_app_reviews(session, app_id, lang, country):
+
+async def load_app_reviews(app_id, lang, country, sync_session):
     try:
         app_reviews = PlayStoreReviews()
-        latest_review_ids = session.execute(
+        latest_review_ids = sync_session.execute(
             select(AppReviewsModel.review_id).where(
                 and_(
                     AppReviewsModel.app_id == app_id,
@@ -150,26 +163,32 @@ def load_app_reviews(session, app_id, lang, country):
         ).all()
         latest_review_ids = set(
             latest_review_id[0] for latest_review_id in latest_review_ids
-        )  # cached ids
-        print(len(latest_review_ids))
+        )
+
         token = None
         while reviews := app_reviews.reviews(
-                app_id, lang, country, continuation_token=token
+            app_id, lang, country, continuation_token=token, count=500
         ):
             reviews, token = reviews
-            print(len(reviews))
-            if not store_reviews_sync_way(reviews, app_id, country, latest_review_ids):
-                break
+            logging.info(f"Fetched {len(reviews)} reviews. Token: {token}")
+            success = await store_reviews_async_way(
+                reviews, app_id, country, latest_review_ids
+            )
+            if not success:
+                logging.info("Reviews are loaded in DB")
             else:
-                logging.info("Reviews loaded in db")
+                logging.info("Some reviews already exist, skipping")
     except Exception as e:
-        logging.error(e)
-    else:
-        return True
+        logging.exception(f"Error while loading reviews, {e}")
+        return False
+    return True
 
-def load_data(app_id, lang="en", country="us"):
+
+async def load_data(app_id, lang="en", country="us"):
     with Session(engine) as session:
-        if load_app_details(session, app_id, lang, country) and load_app_reviews(session, app_id, lang, country):
+        success = load_app_details(session, app_id, lang, country)
+        reviews_success = await load_app_reviews(app_id, lang, country, session)
+        if success and reviews_success:
             logging.info("Successfully loaded app details and reviews")
             return True
         else:
@@ -177,5 +196,6 @@ def load_data(app_id, lang="en", country="us"):
             return False
 
 
-if __name__ == "__main__":
-    print(load_data("com.flyersoft.moonreader"))
+# if __name__ == "__main__":
+#     result = asyncio.run(load_data("com.flyersoft.moonreader"))
+#     print(result)
