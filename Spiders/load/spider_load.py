@@ -1,11 +1,15 @@
 import logging
 import os
 from pathlib import Path
+from typing import List
 from uuid import UUID
+import asyncio
 
 from dotenv import load_dotenv
 from sqlalchemy import and_, create_engine, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from contextlib import asynccontextmanager
 
 from Spiders.models.spider_models.models import (AppDetailsModel,
                                                  AppDeveloperDetailsModel,
@@ -15,7 +19,7 @@ from Spiders.models.spider_models.models import (AppDetailsModel,
 from Spiders.PlayStoreScraper.play_store_scraper import (PlayStoreAppDetails,
                                                          PlayStoreReviews)
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -25,9 +29,16 @@ DATABASE = os.getenv("SPIDER_DB_NAME")
 DB_USER = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DATABASE}"
-
+ASYNC_DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
+async_engine = create_async_engine(ASYNC_DB_URL)
+AsyncSessionLocal = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
 BaseModel.metadata.create_all(engine)
+
+@asynccontextmanager
+async def get_async_session():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 def load_app_details(session, app_id, lang, country):
     try:
@@ -95,6 +106,37 @@ def load_app_details(session, app_id, lang, country):
     else:
         return True
 
+async def save_reviews_async(reviews: List[dict], app_id: str, country: str, latest_review_ids: set, session: AsyncSession):
+    for review in reviews:
+        if UUID(review.get("reviewId")) in latest_review_ids:
+            return True  # flag = True
+
+        review_model = AppReviewsModel(
+            app_id=app_id,
+            app_country=country,
+            review_id=UUID(review.get("reviewId")),
+            user_name=review.get("userName"),
+            content=review.get("content"),
+            ratings=review.get("score"),
+            thumbs_up_count=review.get("thumbsUpCount"),
+            review_created_at=review.get("at"),
+            review_created_version=review.get("reviewCreatedVersion"),
+            review_reply=review.get("replyContent"),
+            reply_time=review.get("repliedAt"),
+            current_app_version=review.get("appVersion"),
+        )
+        session.add(review_model)
+
+    await session.commit()
+    return False
+
+def store_reviews_sync_way(reviews, app_id, country, latest_review_ids):
+    async def _wrapper():
+        async with get_async_session() as session:
+            return await save_reviews_async(reviews, app_id, country, latest_review_ids, session)
+
+    return asyncio.run(_wrapper())
+
 def load_app_reviews(session, app_id, lang, country):
     try:
         app_reviews = PlayStoreReviews()
@@ -109,40 +151,23 @@ def load_app_reviews(session, app_id, lang, country):
         latest_review_ids = set(
             latest_review_id[0] for latest_review_id in latest_review_ids
         )  # cached ids
+        print(len(latest_review_ids))
         token = None
-        flag = False
         while reviews := app_reviews.reviews(
                 app_id, lang, country, continuation_token=token
         ):
             reviews, token = reviews
-            for review in reviews:
-                if UUID(review.get("reviewId")) in latest_review_ids:
-                    flag = True
-                    break
-                review_model = AppReviewsModel(
-                    app_id=app_id,
-                    app_country=country,
-                    review_id=UUID(review.get("reviewId")),
-                    user_name=review.get("userName"),
-                    content=review.get("content"),
-                    ratings=review.get("score"),
-                    thumbs_up_count=review.get("thumbsUpCount"),
-                    review_created_at=review.get("at"),
-                    review_created_version=review.get("reviewCreatedVersion"),
-                    review_reply=review.get("replyContent"),
-                    reply_time=review.get("repliedAt"),
-                    current_app_version=review.get("appVersion"),
-                )
-                session.add(review_model)
-            if flag:
+            print(len(reviews))
+            if not store_reviews_sync_way(reviews, app_id, country, latest_review_ids):
                 break
-        session.commit()
+            else:
+                logging.info("Reviews loaded in db")
     except Exception as e:
         logging.error(e)
     else:
         return True
 
-def load_data(app_id, lang, country):
+def load_data(app_id, lang="en", country="us"):
     with Session(engine) as session:
         if load_app_details(session, app_id, lang, country) and load_app_reviews(session, app_id, lang, country):
             logging.info("Successfully loaded app details and reviews")
@@ -150,3 +175,7 @@ def load_data(app_id, lang, country):
         else:
             logging.info("Failed to load app details and reviews")
             return False
+
+
+if __name__ == "__main__":
+    print(load_data("com.flyersoft.moonreader"))
