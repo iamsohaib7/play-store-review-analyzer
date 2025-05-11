@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List
 from uuid import UUID
 
+import httpx
 from dotenv import load_dotenv
 from sqlalchemy import and_, create_engine, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -19,7 +20,7 @@ from Spiders.models.spider_models.models import (AppDetailsModel,
 from Spiders.PlayStoreScraper.play_store_scraper import (PlayStoreAppDetails,
                                                          PlayStoreReviews)
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -28,6 +29,8 @@ PORT = os.getenv("DB_PORT")
 DATABASE = os.getenv("SPIDER_DB_NAME")
 DB_USER = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+MICRO_HOST = os.getenv("MICRO_HOST")  # Microservice host address
+ANALYSIS_PATH = os.getenv("ANALYSIS_PATH")  # Microservice path to analysis
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 ASYNC_DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
@@ -111,6 +114,13 @@ def load_app_details(session, app_id, lang, country):
         return True
 
 
+def analysis_app_reviews(reviews):
+    return [
+        {"review_id": review.get("reviewId"), "review_text": review.get("content")}
+        for review in reviews
+    ]
+
+
 async def save_reviews_async(
     reviews: List[dict],
     app_id: str,
@@ -170,6 +180,14 @@ async def load_app_reviews(app_id, lang, country, sync_session):
             app_id, lang, country, continuation_token=token, count=500
         ):
             reviews, token = reviews
+            analysis_reviews = analysis_app_reviews(reviews)
+            with httpx.Client() as client:
+                response = client.post(
+                    f"{MICRO_HOST}/{ANALYSIS_PATH}/",
+                    json={"reviews": analysis_reviews},
+                    timeout=100,
+                )
+                print(response.json())
             logging.info(f"Fetched {len(reviews)} reviews. Token: {token}")
             success = await store_reviews_async_way(
                 reviews, app_id, country, latest_review_ids
