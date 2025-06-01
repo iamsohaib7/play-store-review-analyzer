@@ -1,4 +1,8 @@
 # Titlte: Enhancing App Features Through Real-Time User Reviews
+Group Member
+#### Abdul Wahab         L1F21BSDS0017@UCP.EDU.PK
+#### Sohaib Tanveer      L1F21BSDS0011@UCP.EDU.PK
+#### Muhammad Hassaan    L1F21BSDS0002@UCP.EDU.PK
 
 ## Description:
     The project aims to enhance app development by leveraging real-time user feedback from App Stores through advanced Natural Language Processing  
