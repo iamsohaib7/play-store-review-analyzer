@@ -4,9 +4,9 @@
 
 | Team Member | Role | Responsibilities |
 |-------------|------|------------------|
-| **Abdul Wahab** | Documentation & Testing Lead | Test case development, QA, documentation |
-| **Sohaib Tanveer** | Backend Developer | Django development, API design, ML integration |
-| **Muhammad Hassaan** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
+| **Abdul Wahab** | Backend Developer | Django development, API design, ML integration |
+| ** Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
+| **Sohaib Tanveer** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
 # Enhancing App Features Through Real-time User Reviews
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -541,11 +541,12 @@ We welcome contributions! Please follow these steps:
 **Project Advisor:** Dr. Naveed Hussain  
 **University:** University of Central Punjab, Faculty of Information Technology
 
+
 | Team Member | Role | Responsibilities |
 |-------------|------|------------------|
-| **Abdul Wahab** | Documentation & Testing Lead | Test case development, QA, documentation |
-| **Sohaib Tanveer** | Backend Developer | Django development, API design, ML integration |
-| **Muhammad Hassaan** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
+| **Abdul Wahab** | Backend Developer | Django development, API design, ML integration |
+| ** Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
+| **Sohaib Tanveer** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
 
 ## 📄 License
 
@@ -562,7 +563,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support and questions:
-- **Email:** f24ds004@ucp.edu.pk
+- **Email:** L1F21BSDS0017@ucp.edu.pk
 - **Issues:** [GitHub Issues](https://github.com/your-org/app-review-analyzer/issues)
 - **Documentation:** [Wiki](https://github.com/your-org/app-review-analyzer/wiki)
 
