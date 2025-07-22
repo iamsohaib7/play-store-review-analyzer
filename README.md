@@ -23,6 +23,7 @@ A comprehensive web application that helps app developers automatically analyze 
 - [Features](#features)
 - [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
+- [User Manual](#User-Manual)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Documentation](#api-documentation)
@@ -35,6 +36,13 @@ A comprehensive web application that helps app developers automatically analyze 
 ## 🎯 Overview
 
 The project aims to enhance app development by leveraging **real-time user feedback from App Stores** through advanced **Natural Language Processing (NLP)** techniques. It automatically analyzes user reviews to identify common themes, issues, and feature requests, providing actionable insights and recommendations for app improvements.
+
+### **Objectives/Aims/Targets (New objectives to add)**
+
+- To implement automated fake review detection and filtering mechanisms for improved data quality
+- To provide developer feedback loop integration allowing system learning and recommendation refinement
+- To ensure 99.9% system uptime through robust cloud infrastructure and monitoring
+- To support multi-platform review analysis (future scope for iOS App Store integration)
 
 ### 🔑 **Key Capabilities**
 - **Intelligent Review Analysis:** Automatically processes thousands of user reviews to extract meaningful insights
@@ -165,6 +173,50 @@ Our system provides a complete end-to-end solution for real-time app review anal
 - **Secure:** HTTPS, JWT authentication, encrypted data storage
 - **Real-time:** WebSocket support for live updates
 - **Cloud-Native:** Leverages AWS services for reliability and scalability
+
+### **User Manual**
+## 🛠️ Troubleshooting Common Issues
+
+### 🔐 Login / Authentication Problems
+- **Issue:** Unable to log in or access restricted areas.
+- **Solution:** Ensure credentials are correct and that cookies or localStorage are enabled. If using OAuth, enable third-party cookies.
+
+### 💳 Payment Processing Failures
+- **Issue:** Payments not going through or showing errors.
+- **Solution:** Verify payment gateway API keys, and ensure proper internet connectivity. Check transaction logs for specific errors.
+
+### 🐢 Data Loading Delays
+- **Issue:** Dashboard takes too long to load data.
+- **Solution:** Confirm backend services are running, database queries are optimized, and the ML pipeline is responsive.
+
+### 🌐 Browser Compatibility Issues
+- **Issue:** Some UI elements are not displaying or behaving correctly.
+- **Solution:** Use updated versions of Chrome, Firefox, or Edge. Clear browser cache and disable conflicting extensions.
+
+### 📶 Network Connectivity Problems
+- **Issue:** App fails to load or loses connection intermittently.
+- **Solution:** Check internet connection stability. Ensure WebSocket and API endpoints are accessible and not blocked by firewalls.
+
+---
+
+## 🚀 Advanced Features
+
+### 🔍 Filtering and Sorting in Dashboard
+- Easily filter reviews by rating, sentiment, keywords, or date range.
+- Sort feature suggestions based on urgency, frequency, or impact.
+
+### 📤 Exporting Data and Reports
+- Export dashboards or insights in CSV, JSON, or PDF formats.
+- Download visualizations and charts for offline use or presentations.
+
+### 🔔 Setting Up Automated Alerts
+- Create alerts for negative trends, repeated bug mentions, or urgent reviews.
+- Get notified via email, SMS, or third-party integrations like Slack.
+
+### 🎨 Customizing Dashboard Views
+- Switch between dark and light themes.
+- Reorder widgets, select metrics, and personalize layout according to team needs.
+
 
 ## 🚀 Installation
 
