@@ -5,7 +5,7 @@
 | Team Member | Role | Responsibilities |
 |-------------|------|------------------|
 | **Abdul Wahab** | Backend Developer | Django development, API design, ML integration |
-| ** Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
+| **Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
 | **Sohaib Tanveer** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
 # Enhancing App Features Through Real-time User Reviews
 
@@ -545,7 +545,7 @@ We welcome contributions! Please follow these steps:
 | Team Member | Role | Responsibilities |
 |-------------|------|------------------|
 | **Abdul Wahab** | Backend Developer | Django development, API design, ML integration |
-| ** Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
+| **Muhammad Hassaan** | Documentation & Testing Lead | Test case development, QA, documentation |
 | **Sohaib Tanveer** | Frontend Developer | ReactJS development, UI/UX design, dashboard |
 
 ## 📄 License
