@@ -174,7 +174,7 @@ Our system provides a complete end-to-end solution for real-time app review anal
 - **Real-time:** WebSocket support for live updates
 - **Cloud-Native:** Leverages AWS services for reliability and scalability
 
-### **User Manual**
+### 🌐 User Manual
 ## 🛠️ Troubleshooting Common Issues
 
 ### 🔐 Login / Authentication Problems
@@ -200,7 +200,6 @@ Our system provides a complete end-to-end solution for real-time app review anal
 ---
 
 ## 🚀 Advanced Features
-
 ### 🔍 Filtering and Sorting in Dashboard
 - Easily filter reviews by rating, sentiment, keywords, or date range.
 - Sort feature suggestions based on urgency, frequency, or impact.
