@@ -10,8 +10,8 @@
 # Enhancing App Features Through Real-time User Reviews
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
-[![Django](https://img.shields.io/badge/django-4.0+-green.svg)](https://djangoproject.com)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
+[![Django](https://img.shields.io/badge/django-5.0+-green.svg)](https://djangoproject.com)
 [![React](https://img.shields.io/badge/react-18.0+-blue.svg)](https://reactjs.org)
 [![AWS](https://img.shields.io/badge/AWS-deployed-orange.svg)](https://aws.amazon.com)
 
