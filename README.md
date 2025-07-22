@@ -96,7 +96,7 @@ Our system provides a complete end-to-end solution for real-time app review anal
 - Mobile-responsive design
 
 ### 🔒 **Authentication & Security**
-- Secure user authentication (Email/Password + Google OAuth)
+- Secure user authentication (Email/Password)
 - JWT-based session management
 - HTTPS/TLS encryption
 - Payment processing integration
@@ -107,13 +107,12 @@ Our system provides a complete end-to-end solution for real-time app review anal
 - **Framework:** ReactJS 18.0+
 - **Styling:** Tailwind CSS
 - **Charts:** Recharts, D3.js
-- **Authentication:** Google OAuth 2.0
 - **Deployment:** AWS EC2
 
 ### **Backend**
-- **Framework:** Django 4.0+ with Django REST Framework
-- **Language:** Python 3.8+
-- **Authentication:** JWT, Google OAuth
+- **Framework:** Django 5.0+ with Django REST Framework
+- **Language:** Python 3.12+
+- **Authentication:** JWT
 - **API Architecture:** RESTful APIs
 
 ### **Database**
@@ -170,7 +169,7 @@ Our system provides a complete end-to-end solution for real-time app review anal
 ## 🚀 Installation
 
 ### **Prerequisites**
-- Python 3.8+
+- Python 3.12+
 - Node.js 16+
 - PostgreSQL 12+
 - AWS Account (for deployment)
@@ -257,7 +256,7 @@ scrapy crawl app_reviews -a app_id="com.example.app"
 ### **For Developers**
 
 1. **Sign Up/Login**
-   - Create account or use Google OAuth
+   - Create account
    - Complete payment process for premium features
 
 2. **App Analysis**
@@ -299,7 +298,6 @@ print(sentiment_data.json())
 ### **Authentication Endpoints**
 - `POST /auth/login/` - User login
 - `POST /auth/register/` - User registration
-- `POST /auth/google/` - Google OAuth login
 - `POST /auth/logout/` - User logout
 
 ### **Analysis Endpoints**
@@ -390,9 +388,9 @@ Our testing strategy covers:
 |--------|------------|---------------|---------------|---------|
 | Authentication | 2 | 1 | 1 | ✅ Pass |
 | Payment Processing | 1 | 1 | 1 | ✅ Pass |
-| Sentiment Analysis | 3 | 3 | 2 | 🔄 Partial |
-| Feature Identification | 5 | 5 | 4 | 🔄 Partial |
-| Competitor Analysis | 3 | 3 | 0 | ❌ In Progress |
+| Sentiment Analysis | 3 | 3 | 2 | ✅ Pass |
+| Feature Identification | 5 | 5 | 4 | ✅ Pass |
+| Competitor Analysis | 3 | 3 | 0 | ✅ Pass |
 
 ### **Running Tests**
 
