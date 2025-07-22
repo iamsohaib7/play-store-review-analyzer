@@ -221,7 +221,7 @@ Our system provides a complete end-to-end solution for real-time app review anal
 
 ### **Prerequisites**
 - Python 3.12+
-- Node.js 16+
+- Django
 - PostgreSQL 12+
 - AWS Account (for deployment)
 
